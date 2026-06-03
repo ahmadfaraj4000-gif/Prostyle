@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Appointment | ProStyle Barbershop</title>
+    <meta name="description" content="Book a haircut appointment with ProStyle Barbershop in Hartford, CT." />
+    <link rel="icon" href="./assets/logo.png" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header>
+      <div class="appointment-header">
+      <a class="brand" href="./index.html">
+        <img src="./assets/logo.png" alt="ProStyle Barbershop logo" />
+        <span>
+          <strong>ProStyle</strong>
+          <span>2562 Main St, Hartford · (860) 244-0379</span>
+        </span>
+      </a>
+      </div>
+    </header>
+
+    <main>
+      <div class="eyebrow">Appointments</div>
+      <h1>Book ahead.</h1>
+      <p>Choose your barber, service, date, and time. Walk-ins and appointment lookup are on the home page.</p>
+      <a class="button secondary" href="./index.html#checkin">Walk-in / lookup</a>
+
+      <form class="booking" id="appointment-form">
+        <section class="box">
+          <h2>Your info</h2>
+          <label for="name">Full name</label>
+          <input id="name" name="name" autocomplete="name" required />
+
+          <label for="phone">Phone</label>
+          <input id="phone" name="phone" inputmode="tel" autocomplete="tel" required />
+
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email" />
+
+          <label for="barber">Barber</label>
+          <select id="barber" name="barberId">
+            <option value="rick">Rick</option>
+            <option value="barber-2">Barber 2</option>
+            <option value="barber-3">Barber 3</option>
+          </select>
+
+          <label for="service">Service</label>
+          <select id="service" name="serviceId">
+            <option value="adult-init-a">Adult Initiator A · $43 · 1 hr</option>
+            <option value="adult-init-b">Adult Initiator B · $37 · 45 min</option>
+            <option value="child-init-a">Child Initiator A · $33 · 45 min</option>
+            <option value="child-init-b">Child Initiator B · $27 · 30 min</option>
+            <option value="groomer-a">Groomer A · $49 · 1 hr</option>
+            <option value="groomer-b">Groomer B · $43 · 45 min</option>
+            <option value="sustainer-a">Sustainer A · $29 · 45 min</option>
+            <option value="sustainer-b">Sustainer B · $25 · 30 min</option>
+            <option value="sustainer-c">Sustainer C · $23 · 30 min</option>
+            <option value="looker-a">Looker A · $57 · 1 hr 15 min</option>
+            <option value="looker-b">Looker B · $51 · 1 hr</option>
+            <option value="looker-plus-a">Looker + A · $67 · 1 hr 30 min</option>
+            <option value="looker-plus-b">Looker + B · $61 · 1 hr 15 min</option>
+          </select>
+
+          <label for="notes">Notes</label>
+          <textarea id="notes" name="notes"></textarea>
+        </section>
+
+        <section class="box">
+          <h2>Date and time</h2>
+          <div class="calendar">
+            <button type="button" class="day active" data-date="Wednesday, June 3">Wed<small>June 3</small></button>
+            <button type="button" class="day" data-date="Thursday, June 4">Thu<small>June 4</small></button>
+            <button type="button" class="day" data-date="Friday, June 5">Fri<small>June 5</small></button>
+            <button type="button" class="day" data-date="Saturday, June 6">Sat<small>June 6</small></button>
+            <button type="button" class="day" disabled>Sun<small>Closed</small></button>
+            <button type="button" class="day" disabled>Mon<small>Closed</small></button>
+            <button type="button" class="day" data-date="Tuesday, June 9">Tue<small>June 9</small></button>
+          </div>
+
+          <div class="times">
+            <button type="button" class="time" data-time="9:00 AM">9:00 AM</button>
+            <button type="button" class="time" data-time="10:00 AM">10:00 AM</button>
+            <button type="button" class="time" data-time="11:00 AM">11:00 AM</button>
+            <button type="button" class="time" data-time="12:00 PM">12:00 PM</button>
+            <button type="button" class="time" data-time="1:00 PM">1:00 PM</button>
+            <button type="button" class="time" data-time="2:30 PM">2:30 PM</button>
+            <button type="button" class="time" data-time="4:00 PM">4:00 PM</button>
+            <button type="button" class="time" data-time="5:30 PM">5:30 PM</button>
+            <button type="button" class="time" data-time="7:00 PM">7:00 PM</button>
+          </div>
+
+          <div class="notice" id="selected">Selected: Wednesday, June 3 · choose a time</div>
+          <button type="submit">Book appointment</button>
+          <p class="message" id="result"></p>
+        </section>
+      </form>
+    </main>
+
+    <footer>
+      <p class="footer-line">ProStyle Barbershop · 2562 Main St, Hartford, CT 06120 · <a href="tel:18602440379">(860) 244-0379</a></p>
+      <p class="powered-by">Powered by <a href="https://reimagebs.com">RE IMAGE BUSINESS SOLUTIONS</a></p>
+    </footer>
+
+    <script>
+      let selectedDate = "Wednesday, June 3";
+      let selectedTime = "";
+      const selected = document.querySelector("#selected");
+      const API_BASE = "http://127.0.0.1:8787/api";
+
+      function id(prefix) {
+        return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      }
+
+      async function api(path, options) {
+        const response = await fetch(`${API_BASE}${path}`, {
+          headers: { "Content-Type": "application/json" },
+          ...options
+        });
+        if (!response.ok) throw new Error(`API ${response.status}`);
+        return response.json();
+      }
+
+      function updateSelected() {
+        selected.textContent = `Selected: ${selectedDate} · ${selectedTime || "choose a time"}`;
+      }
+
+      document.querySelectorAll("[data-date]").forEach((button) => {
+        button.addEventListener("click", () => {
+          document.querySelectorAll("[data-date]").forEach((day) => day.classList.remove("active"));
+          button.classList.add("active");
+          selectedDate = button.dataset.date;
+          updateSelected();
+        });
+      });
+
+      document.querySelectorAll("[data-time]").forEach((button) => {
+        button.addEventListener("click", () => {
+          document.querySelectorAll("[data-time]").forEach((time) => time.classList.remove("active"));
+          button.classList.add("active");
+          selectedTime = button.dataset.time;
+          updateSelected();
+        });
+      });
+
+      document.querySelector("#appointment-form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const result = document.querySelector("#result");
+        if (!selectedTime) {
+          result.textContent = "Choose a time before booking.";
+          return;
+        }
+
+        const form = new FormData(event.currentTarget);
+        const appointment = {
+          id: id("a"),
+          name: form.get("name"),
+          phone: form.get("phone"),
+          email: form.get("email"),
+          barberId: form.get("barberId"),
+          serviceId: form.get("serviceId"),
+          notes: form.get("notes"),
+          addonIds: [],
+          date: selectedDate,
+          time: selectedTime,
+          status: "Booked"
+        };
+
+        try {
+          await api("/appointments", { method: "POST", body: JSON.stringify(appointment) });
+          result.textContent = `Booked for ${selectedDate} at ${selectedTime}. The admin portal has this appointment.`;
+          event.currentTarget.reset();
+        } catch {
+          result.textContent = "Could not reach the admin backend. Start prostyle-admin with npm run server, then submit again.";
+        }
+      });
+    </script>
+  </body>
+</html>
