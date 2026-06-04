@@ -74,7 +74,7 @@
             <p>Everyone currently waiting in the shop, including walk-ins and checked-in appointments.</p>
           </div>
           <div class="queue" id="global-queue">
-            <div class="queue-row"><strong>1</strong><span>Example customer · Walk-in · Groomer A</span><span>Rick</span></div>
+            <div class="queue-row"><strong>1</strong><span>Example customer · Walk-in · Men's Haircut</span><span>Rick</span></div>
           </div>
         </section>
         <div class="checkin">
@@ -88,13 +88,23 @@
 
             <label for="walk-service">Service</label>
             <select id="walk-service" name="serviceId">
-              <option value="adult-init-a">Adult Initiator A</option>
-              <option value="adult-init-b">Adult Initiator B</option>
-              <option value="groomer-a">Groomer A</option>
-              <option value="groomer-b">Groomer B</option>
-              <option value="sustainer-a">Sustainer A</option>
-              <option value="sustainer-b">Sustainer B</option>
-              <option value="looker-a">Looker A</option>
+              <option value="mens-haircut">Men's Haircut</option>
+              <option value="mens-specialty">Men's Specialty Haircut</option>
+              <option value="hair-design">Hair Design / Graphics</option>
+              <option value="mens-lining">Men's Hair Lining</option>
+              <option value="head-shave-razor">Men's Head Shave - Razor</option>
+              <option value="senior-lining">Senior's Hair Lining</option>
+              <option value="face-shave">Shaves (Face)</option>
+              <option value="mustache">Mustache</option>
+              <option value="beard-full">Beards (Full)</option>
+              <option value="shampoo">Shampoo</option>
+              <option value="hair-color-head">Hair Coloring (Head)</option>
+              <option value="hair-color-beard">Hair Coloring (Beard)</option>
+              <option value="boys-haircut">Boy's Haircut (12 yrs & under)</option>
+              <option value="boys-lining">Boy's Hair Lining</option>
+              <option value="women-back-taper">Women Haircuts (Back Taper)</option>
+              <option value="women-full">Women Haircuts (Full)</option>
+              <option value="eyebrow-arching">Eyebrow Arching</option>
             </select>
 
             <label for="walk-barber">Barber preference</label>
@@ -121,67 +131,97 @@
 
       <section id="menu" class="section">
         <div class="eyebrow">Services</div>
-        <h2>Haircuts, beard work, edge-ups, and color.</h2>
+        <h2>Haircuts, line-ups, beard work, color, and grooming.</h2>
         <div class="menu-board">
           <article class="menu-item">
-            <h3>Adult Initiator A</h3>
-            <p>Full shampoo haircut with fade, blend, taper, or skin sides. Beard and mustache not included.</p>
-            <strong class="price">$43 · 1 hr</strong>
+            <h3>Men's Haircut</h3>
+            <p>Classic men's haircut service.</p>
+            <strong class="price">$40 · 45 min</strong>
           </article>
           <article class="menu-item">
-            <h3>Adult Initiator B</h3>
-            <p>Full shampoo haircut for even-length, brush, buzz, bald, or selected sides-only work.</p>
-            <strong class="price">$37 · 45 min</strong>
+            <h3>Men's Specialty Haircut</h3>
+            <p>Mohawk, afro, and other specialty haircut styles.</p>
+            <strong class="price">$40+ · 45 min</strong>
           </article>
           <article class="menu-item">
-            <h3>Child Initiator A</h3>
-            <p>Ages 3-13. Full shampoo haircut with fade, blend, taper, or skin sides.</p>
-            <strong class="price">$33 · 45 min</strong>
+            <h3>Hair Design / Graphics</h3>
+            <p>Graphic parts, design work, and detailed clipper artwork.</p>
+            <strong class="price">$40+ · 45 min</strong>
           </article>
           <article class="menu-item">
-            <h3>Child Initiator B</h3>
-            <p>Ages 3-13. Full shampoo haircut for even-length, brush, buzz, or selected sides-only work.</p>
-            <strong class="price">$27 · 30 min</strong>
+            <h3>Men's Hair Lining</h3>
+            <p>Line-up and edge work.</p>
+            <strong class="price">$20+ · 20 min</strong>
           </article>
           <article class="menu-item">
-            <h3>Groomer A</h3>
-            <p>Full shampoo haircut with fade, blend, taper, or skin sides. Beard and mustache included.</p>
-            <strong class="price">$49 · 1 hr</strong>
+            <h3>Men's Head Shave - Razor</h3>
+            <p>Clean razor head shave.</p>
+            <strong class="price">$30 · 30 min</strong>
           </article>
           <article class="menu-item">
-            <h3>Groomer B</h3>
-            <p>Full shampoo haircut for even-length work with beard or mustache included.</p>
-            <strong class="price">$43 · 45 min</strong>
+            <h3>Senior's Hair Lining</h3>
+            <p>Senior hair line-up service.</p>
+            <strong class="price">$10 · 15 min</strong>
           </article>
           <article class="menu-item">
-            <h3>Sustainer A</h3>
-            <p>Edge, outline, light trim, and beard or mustache work. Not a full haircut.</p>
-            <strong class="price">$29 · 45 min</strong>
+            <h3>Shaves (Face)</h3>
+            <p>Face shave service.</p>
+            <strong class="price">$10+ · 20 min</strong>
           </article>
           <article class="menu-item">
-            <h3>Sustainer B</h3>
-            <p>Choice of edge and light trim, or beard and mustache shaping. Not a full haircut.</p>
+            <h3>Mustache</h3>
+            <p>Mustache trim and shape-up.</p>
+            <strong class="price">$10 · 10 min</strong>
+          </article>
+          <article class="menu-item">
+            <h3>Beards (Full)</h3>
+            <p>Full beard trim and grooming.</p>
+            <strong class="price">$10+ · 15 min</strong>
+          </article>
+          <article class="menu-item">
+            <h3>Shampoo</h3>
+            <p>Shampoo service.</p>
+            <strong class="price">$15+ · 15 min</strong>
+          </article>
+          <article class="menu-item">
+            <h3>Texturizer</h3>
+            <p>Texturizer service is currently listed as unavailable.</p>
+            <strong class="price">N/A</strong>
+          </article>
+          <article class="menu-item">
+            <h3>Hair Coloring (Head)</h3>
+            <p>Head hair coloring service.</p>
+            <strong class="price">$30 · 45 min</strong>
+          </article>
+          <article class="menu-item">
+            <h3>Hair Coloring (Beard)</h3>
+            <p>Beard coloring service.</p>
+            <strong class="price">$15 · 25 min</strong>
+          </article>
+          <article class="menu-item">
+            <h3>Boy's Haircut (12 yrs & under)</h3>
+            <p>Children's haircut for boys 12 and under.</p>
             <strong class="price">$25 · 30 min</strong>
           </article>
           <article class="menu-item">
-            <h3>Sustainer C</h3>
-            <p>One feature: hairline edge, eyebrows, beard line, or shampoo and conditioner only.</p>
-            <strong class="price">$23 · 30 min</strong>
+            <h3>Boy's Hair Lining</h3>
+            <p>Children's line-up service.</p>
+            <strong class="price">$10+ · 15 min</strong>
           </article>
           <article class="menu-item">
-            <h3>Looker A</h3>
-            <p>Texturizer or color with full shampoo haircut and fade, blend, taper, or skin sides.</p>
-            <strong class="price">$57 · 1 hr 15 min</strong>
+            <h3>Women Haircuts (Back Taper)</h3>
+            <p>Women's back taper haircut service.</p>
+            <strong class="price">$20 · 25 min</strong>
           </article>
           <article class="menu-item">
-            <h3>Looker + A</h3>
-            <p>Texturizer or color with full shampoo haircut and beard or mustache included.</p>
-            <strong class="price">$67 · 1 hr 30 min</strong>
+            <h3>Women Haircuts (Full)</h3>
+            <p>Full women's haircut service.</p>
+            <strong class="price">$30 · 40 min</strong>
           </article>
           <article class="menu-item">
-            <h3>Looker/Sustainer</h3>
-            <p>Chemical service with edge line, light trim, or beard line options.</p>
-            <strong class="price">$39+ · 45 min+</strong>
+            <h3>Eyebrow Arching</h3>
+            <p>Eyebrow arching and clean-up.</p>
+            <strong class="price">$10 · 10 min</strong>
           </article>
         </div>
       </section>
@@ -195,21 +235,26 @@
     <script>
       const API_BASE = "http://127.0.0.1:8787/api";
       const serviceNames = {
-        "adult-init-a": "Adult Initiator A",
-        "adult-init-b": "Adult Initiator B",
-        "child-init-a": "Child Initiator A",
-        "child-init-b": "Child Initiator B",
-        "groomer-a": "Groomer A",
-        "groomer-b": "Groomer B",
-        "sustainer-a": "Sustainer A",
-        "sustainer-b": "Sustainer B",
-        "sustainer-c": "Sustainer C",
-        "looker-a": "Looker A",
-        "looker-b": "Looker B",
-        "looker-plus-a": "Looker + A",
-        "looker-plus-b": "Looker + B",
-        "looker-sustainer-a": "Looker+/Sustainer A",
-        "looker-sustainer-b": "Looker/Sustainer B"
+        "mens-haircut": "Men's Haircut",
+        "mens-specialty": "Men's Specialty Haircut",
+        "hair-design": "Hair Design / Graphics",
+        "mens-lining": "Men's Hair Lining",
+        "head-shave-razor": "Men's Head Shave - Razor",
+        "senior-lining": "Senior's Hair Lining",
+        "face-shave": "Shaves (Face)",
+        "mustache": "Mustache",
+        "beard-full": "Beards (Full)",
+        "shampoo": "Shampoo",
+        "texturizer": "Texturizer",
+        "hair-color-head": "Hair Coloring (Head)",
+        "hair-color-beard": "Hair Coloring (Beard)",
+        "boys-haircut": "Boy's Haircut (12 yrs & under)",
+        "boys-lining": "Boy's Hair Lining",
+        "women-back-taper": "Women Haircuts (Back Taper)",
+        "women-full": "Women Haircuts (Full)",
+        "eyebrow-arching": "Eyebrow Arching",
+        "adult-init-a": "Men's Haircut",
+        "groomer-b": "Men's Haircut"
       };
       const barberNames = {
         any: "First available",
@@ -217,7 +262,7 @@
         "barber-2": "Barber 2",
         "barber-3": "Barber 3"
       };
-      let queue = [{ name: "Example customer", serviceId: "groomer-a", barberId: "rick", status: "Waiting", type: "Walk-in", enteredAt: Date.now() }];
+      let queue = [{ name: "Example customer", serviceId: "mens-haircut", barberId: "rick", status: "Waiting", type: "Walk-in", enteredAt: Date.now() }];
 
       function id(prefix) {
         return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
