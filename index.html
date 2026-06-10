@@ -68,6 +68,15 @@
       <section id="checkin" class="section">
         <div class="eyebrow">QR check-in</div>
         <h2>Walk in or look up an appointment.</h2>
+        <section class="available-barbers" aria-live="polite">
+          <div>
+            <h3>Available barbers today</h3>
+            <p>Choose an active barber, or select first available for the quickest seat.</p>
+          </div>
+          <div class="barber-chips" id="available-barbers">
+            <span class="barber-chip">Loading barbers...</span>
+          </div>
+        </section>
         <section class="global-queue" id="queue" aria-live="polite">
           <div>
             <h3>In-store queue</h3>
@@ -233,7 +242,7 @@
     </footer>
 
     <script>
-      const API_BASE = "http://127.0.0.1:8787/api";
+      const API_BASE = window.PROSTYLE_API_BASE || "https://laudable-bass-943.convex.site/api";
       const serviceNames = {
         "mens-haircut": "Men's Haircut",
         "mens-specialty": "Men's Specialty Haircut",
@@ -262,6 +271,7 @@
         "barber-2": "Barber 2",
         "barber-3": "Barber 3"
       };
+      let availableBarbers = [];
       let queue = [{ name: "Example customer", serviceId: "mens-haircut", barberId: "rick", status: "Waiting", type: "Walk-in", enteredAt: Date.now() }];
 
       function id(prefix) {
@@ -293,6 +303,35 @@
         return response.json();
       }
 
+      function todayKey() {
+        return new Date().toISOString().slice(0, 10);
+      }
+
+      function isBarberAvailable(barber, dateKey = todayKey()) {
+        if (!barber || barber.active === false || barber.unavailableMode === "indefinite") return false;
+        if (barber.unavailableMode !== "range") return true;
+        const from = barber.unavailableFrom || "0000-01-01";
+        const to = barber.unavailableTo || "9999-12-31";
+        return !(dateKey >= from && dateKey <= to);
+      }
+
+      function drawAvailableBarbers() {
+        const target = document.querySelector("#available-barbers");
+        if (!availableBarbers.length) {
+          target.innerHTML = `<span class="barber-chip unavailable">No barbers are marked active today.</span>`;
+          return;
+        }
+
+        target.innerHTML = availableBarbers.map((barber) => `<span class="barber-chip">${barber.name}</span>`).join("");
+      }
+
+      function populateWalkinBarbers() {
+        const select = document.querySelector("#walk-barber");
+        const current = select.value;
+        select.innerHTML = `<option value="any">First available</option>${availableBarbers.map((barber) => `<option value="${barber.id}">${barber.name}</option>`).join("")}`;
+        select.value = current === "any" || availableBarbers.some((barber) => barber.id === current) ? current : "any";
+      }
+
       function combineQueue(state) {
         const walkins = (state.walkins || [])
           .filter((item) => item.status !== "Done")
@@ -305,10 +344,15 @@
 
       async function refreshQueue() {
         try {
-          queue = combineQueue(await api("/state"));
+          const state = await api("/public/state");
+          availableBarbers = (state.barbers || []).filter((barber) => isBarberAvailable(barber));
+          for (const barber of state.barbers || []) barberNames[barber.id] = barber.name;
+          queue = combineQueue(state);
         } catch {
-          // Keep static preview queue when the backend is not running.
+          // Keep the current view if the booking system cannot be reached.
         }
+        drawAvailableBarbers();
+        populateWalkinBarbers();
         drawQueue();
       }
 
@@ -328,8 +372,12 @@
         try {
           await api("/walkins", { method: "POST", body: JSON.stringify(walkin) });
           await refreshQueue();
-        } catch {
-          // Static fallback for opening the page without the admin backend running.
+        } catch (error) {
+          // Static fallback for local file previews if the booking system cannot be reached.
+          if (error.message.includes("409")) {
+            alert("That barber is not available today. Please choose another barber or first available.");
+            return;
+          }
           queue.push({ ...walkin, type: "Walk-in", enteredAt: walkin.createdAt });
           drawQueue();
         }
@@ -353,12 +401,16 @@
           await api(`/appointments/${appointment.id}/checkin`, { method: "PATCH" });
           result.textContent = `${appointment.name}, you are checked in for ${appointment.time}.`;
           await refreshQueue();
-        } catch {
-          result.textContent = "Start the admin backend to search appointments.";
+        } catch (error) {
+          result.textContent = error.message.includes("409")
+            ? "That barber is not available now. Please ask the shop to reschedule your appointment."
+            : "Could not reach the booking system. Please try again in a moment.";
         }
       });
 
       refreshQueue();
+      window.addEventListener("focus", refreshQueue);
+      setInterval(refreshQueue, 15000);
     </script>
   </body>
 </html>

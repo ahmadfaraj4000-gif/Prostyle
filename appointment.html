@@ -41,9 +41,7 @@
 
           <label for="barber">Barber</label>
           <select id="barber" name="barberId">
-            <option value="rick">Rick</option>
-            <option value="barber-2">Barber 2</option>
-            <option value="barber-3">Barber 3</option>
+            <option value="">Loading available barbers...</option>
           </select>
 
           <label for="service">Service</label>
@@ -73,15 +71,7 @@
 
         <section class="box">
           <h2>Date and time</h2>
-          <div class="calendar">
-            <button type="button" class="day active" data-date="Wednesday, June 3">Wed<small>June 3</small></button>
-            <button type="button" class="day" data-date="Thursday, June 4">Thu<small>June 4</small></button>
-            <button type="button" class="day" data-date="Friday, June 5">Fri<small>June 5</small></button>
-            <button type="button" class="day" data-date="Saturday, June 6">Sat<small>June 6</small></button>
-            <button type="button" class="day" disabled>Sun<small>Closed</small></button>
-            <button type="button" class="day" disabled>Mon<small>Closed</small></button>
-            <button type="button" class="day" data-date="Tuesday, June 9">Tue<small>June 9</small></button>
-          </div>
+          <div class="calendar" id="calendar"></div>
 
           <div class="times">
             <button type="button" class="time" data-time="9:00 AM">9:00 AM</button>
@@ -109,9 +99,11 @@
 
     <script>
       let selectedDate = "Wednesday, June 3";
+      let selectedDateKey = "";
       let selectedTime = "";
       const selected = document.querySelector("#selected");
-      const API_BASE = "http://127.0.0.1:8787/api";
+      const API_BASE = window.PROSTYLE_API_BASE || "https://laudable-bass-943.convex.site/api";
+      let publicState = { barbers: [] };
 
       function id(prefix) {
         return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -130,14 +122,87 @@
         selected.textContent = `Selected: ${selectedDate} · ${selectedTime || "choose a time"}`;
       }
 
-      document.querySelectorAll("[data-date]").forEach((button) => {
-        button.addEventListener("click", () => {
-          document.querySelectorAll("[data-date]").forEach((day) => day.classList.remove("active"));
-          button.classList.add("active");
-          selectedDate = button.dataset.date;
-          updateSelected();
+      function dateKey(date) {
+        return date.toISOString().slice(0, 10);
+      }
+
+      function dateLabel(date) {
+        return new Intl.DateTimeFormat("en-US", { weekday: "long", month: "long", day: "numeric" }).format(date);
+      }
+
+      function shortDay(date) {
+        return new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date);
+      }
+
+      function shortDate(date) {
+        return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date);
+      }
+
+      function isClosed(date) {
+        return [0, 1].includes(date.getDay());
+      }
+
+      function isBarberAvailable(barber, key = selectedDateKey) {
+        if (!barber || barber.active === false || barber.unavailableMode === "indefinite") return false;
+        if (barber.unavailableMode !== "range") return true;
+        const from = barber.unavailableFrom || "0000-01-01";
+        const to = barber.unavailableTo || "9999-12-31";
+        return !(key >= from && key <= to);
+      }
+
+      function buildCalendar() {
+        const calendar = document.querySelector("#calendar");
+        const days = [];
+        for (let offset = 0; days.length < 7; offset += 1) {
+          const date = new Date();
+          date.setDate(date.getDate() + offset);
+          const key = dateKey(date);
+          if (!selectedDateKey && !isClosed(date)) {
+            selectedDateKey = key;
+            selectedDate = dateLabel(date);
+          }
+          days.push({ date, key, closed: isClosed(date) });
+        }
+
+        calendar.innerHTML = days.map((day) => `
+          <button type="button" class="day ${day.key === selectedDateKey ? "active" : ""}" ${day.closed ? "disabled" : ""} data-date="${day.key}" data-label="${dateLabel(day.date)}">
+            ${shortDay(day.date)}<small>${day.closed ? "Closed" : shortDate(day.date)}</small>
+          </button>`).join("");
+
+        document.querySelectorAll("[data-date]").forEach((button) => {
+          button.addEventListener("click", () => {
+            document.querySelectorAll("[data-date]").forEach((day) => day.classList.remove("active"));
+            button.classList.add("active");
+            selectedDateKey = button.dataset.date;
+            selectedDate = button.dataset.label;
+            selectedTime = "";
+            document.querySelectorAll("[data-time]").forEach((time) => time.classList.remove("active"));
+            populateBarbers();
+            updateSelected();
+          });
         });
-      });
+      }
+
+      function populateBarbers() {
+        const select = document.querySelector("#barber");
+        const available = (publicState.barbers || []).filter((barber) => isBarberAvailable(barber));
+        const current = select.value;
+        if (!available.length) {
+          select.innerHTML = `<option value="">No barbers available for this date</option>`;
+          return;
+        }
+        select.innerHTML = available.map((barber) => `<option value="${barber.id}">${barber.name}</option>`).join("");
+        if (available.some((barber) => barber.id === current)) select.value = current;
+      }
+
+      async function loadPublicState() {
+        try {
+          publicState = await api("/public/state");
+        } catch {
+          publicState = { barbers: [] };
+        }
+        populateBarbers();
+      }
 
       document.querySelectorAll("[data-time]").forEach((button) => {
         button.addEventListener("click", () => {
@@ -166,19 +231,33 @@
           serviceId: form.get("serviceId"),
           notes: form.get("notes"),
           addonIds: [],
-          date: selectedDate,
+          date: selectedDateKey,
+          dateLabel: selectedDate,
           time: selectedTime,
           status: "Booked"
         };
+
+        if (!appointment.barberId) {
+          result.textContent = "No barbers are available for that date. Please choose another date.";
+          return;
+        }
 
         try {
           await api("/appointments", { method: "POST", body: JSON.stringify(appointment) });
           result.textContent = `Booked for ${selectedDate} at ${selectedTime}. The admin portal has this appointment.`;
           event.currentTarget.reset();
-        } catch {
-          result.textContent = "Could not reach the admin backend. Start prostyle-admin with npm run server, then submit again.";
+        } catch (error) {
+          result.textContent = error.message.includes("409")
+            ? "That barber is no longer available for this date. Please choose another barber or reschedule."
+            : "Could not reach the booking system. Please try again in a moment.";
         }
       });
+
+      buildCalendar();
+      loadPublicState();
+      window.addEventListener("focus", loadPublicState);
+      setInterval(loadPublicState, 15000);
+      updateSelected();
     </script>
   </body>
 </html>
